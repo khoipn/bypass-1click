@@ -19,11 +19,10 @@ app.get("/", async (req, res) => {
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
         "--disable-gpu",
-        "--disable-background-networking",
         "--disable-software-rasterizer",
-        "--disable-breakpad",
-        "--no-zygote",
+        "--disable-background-networking",
         "--disable-web-security",
+        "--no-zygote",
       ],
     });
 
@@ -31,14 +30,13 @@ app.get("/", async (req, res) => {
 
     await page.goto(`https://${shop}/password`, {
       waitUntil: "domcontentloaded",
-      timeout: 15000,
+      timeout: 20000,
     });
 
     await page.fill('input[type="password"]', pw);
     await page.click('button[type="submit"], input[type="submit"]');
 
-    // Chờ Shopify redirect sau khi nhập password
-    await page.waitForNavigation({ timeout: 8000 }).catch(() => {});
+    await page.waitForNavigation({ timeout: 12000 }).catch(() => {});
 
     const cookies = await page.context().cookies();
     const digest = cookies.find((c) => c.name === "storefront_digest");
@@ -54,8 +52,7 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Railway bắt buộc phải listen PORT như sau
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Running on port ${port}`);
+  console.log("Running on port", port);
 });

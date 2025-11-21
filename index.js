@@ -9,7 +9,10 @@ app.get("/", async (req, res) => {
 
   if (!shop) return res.send("Missing ?shop=");
 
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  });
+
   const page = await browser.newPage();
 
   try {
@@ -27,10 +30,7 @@ app.get("/", async (req, res) => {
 
     if (!digest) return res.send("Bypass failed. Wrong password?");
 
-    const finalUrl = `https://${shop}/?storefront_digest=${digest.value}`;
-
-    return res.redirect(finalUrl);
-
+    return res.redirect(`https://${shop}/?storefront_digest=${digest.value}`);
   } catch (err) {
     await browser.close();
     return res.send("Error: " + err.message);
@@ -38,5 +38,4 @@ app.get("/", async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Bypass running on port " + port));
-
+app.listen(port, () => console.log(`Running on ${port}`));
